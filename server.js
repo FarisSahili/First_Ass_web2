@@ -5,8 +5,9 @@
 // https://pokeapi.co/docs/v2
 
 const axios = require("axios");
-
+const path = require("path");
 const express = require('express');
+let ejs = require('ejs');
 // Init Package
 const app = express();
 
@@ -18,12 +19,8 @@ async function makeRequestFirstFunc() {
 
   };
   let resFirst = await axios(config);
-  return resFirst.data;
+  return resFirst;
 
-  // console.log("Name 1 = ");
-  // console.log(`Pokemon Name: ${res.data.name}`);
-  // console.log("Order 1 = ");
-  // console.log(`Pokemon Order: ${res.data.order}`);
 }
 makeRequestFirstFunc();
 
@@ -31,14 +28,11 @@ async function makeRequestSecondFunc() {
   // Configure request
   const config = {
     method: "get", // request method (get, post, ...)
-    url: "https://pokeapi.co/api/v2/pokemon", // API link
+    url: "https://pokeapi.co/api/v2/pokemon/eevee", // API link
   };
   let resSecond = await axios(config);
-  return resSecond.data;
-  // console.log("Name 2 = ");
-  // console.log(`Pokemon Name: ${res.data.name}`);
-  // console.log("Order 2 = ");
-  // console.log(`Pokemon Order: ${res.data.order}`);
+  return resSecond;
+
 }
 makeRequestSecondFunc();
 
@@ -46,37 +40,31 @@ async function makeRequestThirdFunc() {
   // Configure request
   const config = {
     method: "get", // request method (get, post, ...)
-    url: "https://pokeapi.co/api/v2/berry-firmness", // API link
+    url: "https://pokeapi.co/api/v2/pokemon/garchomp", // API link
   };
   let resThird = await axios(config);
-  return resThird.data;
-  // console.log("Name 3 = ");
-  // console.log(`Pokemon Name: ${res.data.name}`);
-  // console.log("Order 3 = ");
-  // console.log(`Pokemon Order: ${res.data.order}`);
+  return resThird;
+ 
 }
 makeRequestThirdFunc();
 
 //Routes
-app.get("/", (req, res) => {
-  res.render("views.ejs", {
-    title: "Home Page",
-    poki: [
-      {
-        name: "${resFirst.data.name}",
-        order: "${resFirst.data.order}",
-      },
-      {
-        name: "${resSecond.data.name}",
-        order: "${resSecond.data.order}",
-      },
-      {
-        name: "${resThird.data.name}",
-        order: "${resThird.data.order}",
-      }
-    ],
-  });
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+app.get("/", async (req, res) => {
+  let firstFunc = await makeRequestFirstFunc();
+  let secondFunc =await makeRequestSecondFunc();
+  let thirdFunc = await makeRequestThirdFunc();
+  res.render("view", { title: "test" , fF:firstFunc.data , sF : secondFunc.data , tF : thirdFunc.data })
+})
+
+
+
+
+app.listen(3001, () => {
+  console.log("http://localhost:3001")
 });
-app.listen(3000);
 
 // note : I tried it, and I didn't come out with a result.
